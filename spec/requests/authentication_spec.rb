@@ -6,7 +6,7 @@ RSpec.describe 'Authentication', type: :request do
   describe 'POST /authenticate' do
     context 'valid request' do
       before do
-        post '/authenticate', params: { email: user.email, password: 'Asdf123' }
+        post '/authenticate', params: { email: user.email, password: user.password }
       end
 
       it 'returns a http status of :created' do
@@ -23,13 +23,13 @@ RSpec.describe 'Authentication', type: :request do
 
     context 'invalid request' do
       it 'returns a http status of :unprocessable_entity' do
-        post '/authenticate', params: { password: 'Asdf123' }
+        post '/authenticate', params: { password: user.password }
 
         expect(response).to have_http_status :unprocessable_entity
       end
 
       it 'returns error if email param is missing' do
-        post '/authenticate', params: { password: 'Asdf123' }
+        post '/authenticate', params: { password: user.password }
 
         expect(response_body).to eq(
           { 'error' => 'param is missing or the value is empty: email' }
@@ -42,6 +42,11 @@ RSpec.describe 'Authentication', type: :request do
         expect(response_body).to eq(
           { 'error' => 'param is missing or the value is empty: password' }
         )
+      end
+
+      it 'returns a http status of :unauthorized' do
+        post '/authenticate', params: { email: user.email, password: 'incorrect' }
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
