@@ -1,6 +1,6 @@
 class Api::V1::BooksController < Api::V1::BaseController
   def index
-    books = Book.all
+    books = Book.limit(limit).offset(params[:offset])
     success_response BookSerializer.new(books).serializable_hash.to_json
   end
 
@@ -13,6 +13,12 @@ class Api::V1::BooksController < Api::V1::BaseController
     else
       error_response({ error: book.errors }, :unprocessable_entity)
     end
+  end
+
+  def destroy
+    book = Book.find(params[:id])
+    book.destroy!
+    head :no_content
   end
 
   private

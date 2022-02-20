@@ -9,18 +9,41 @@ RSpec.describe 'Books', type: :request do
     before do
       book1
       book2
-      get '/books'
     end
 
     it 'returns http status of :ok' do
+      get '/books'
       expect(response).to have_http_status :ok
     end
 
     it 'returns all books' do
+      get '/books'
       expect(response_body).to eq(
         {
           'data' => [
             { 'attributes' => { 'title' => book1.title }, 'id' => book1.id.to_s, 'type' => 'book' },
+            { 'attributes' => { 'title' => book2.title }, 'id' => book2.id.to_s, 'type' => 'book' }
+          ]
+        }
+      )
+    end
+
+    it 'returns a subset of books based on limit' do
+      get '/books', params: { limit: 1 }
+      expect(response_body).to eq(
+        {
+          'data' => [
+            { 'attributes' => { 'title' => book1.title }, 'id' => book1.id.to_s, 'type' => 'book' }
+          ]
+        }
+      )
+    end
+
+    it 'returns a subset of books based on limit and offset' do
+      get '/books', params: { limit: 1, offset: 1 }
+      expect(response_body).to eq(
+        {
+          'data' => [
             { 'attributes' => { 'title' => book2.title }, 'id' => book2.id.to_s, 'type' => 'book' }
           ]
         }
@@ -63,6 +86,22 @@ RSpec.describe 'Books', type: :request do
           'data' => { 'attributes' => { 'title' => book.title }, 'id' => book.id.to_s, 'type' => 'book' }
         }
       )
+    end
+  end
+
+  describe 'DELETE /books/:id' do
+    let(:book_delete_request) { delete "/books/#{book1.id}" }
+    before { book1 }
+
+    it 'returns http status of :no_content' do
+      book_delete_request
+      expect(response).to have_http_status :no_content
+    end
+
+    it 'deletes the book' do
+      expect {
+        book_delete_request 
+      }.to change { Book.count }.from(1).to(0)
     end
   end
 end

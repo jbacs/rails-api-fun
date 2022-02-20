@@ -7,9 +7,4 @@ Rails.application.routes.draw do
               default: true) do
     resources :books, only: %i[index create destroy]
   end
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
-  
 end
