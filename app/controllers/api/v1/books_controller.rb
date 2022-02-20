@@ -9,6 +9,7 @@ class Api::V1::BooksController < Api::V1::BaseController
     book = Book.new(book_params.merge(author_id: author.id))
 
     if book.save
+      UpdateSkuJob.perform_later(book.title)
       success_response BookSerializer.new(book).serializable_hash.to_json, :created
     else
       error_response({ error: book.errors }, :unprocessable_entity)
