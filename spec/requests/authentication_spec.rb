@@ -1,11 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe 'Authentication', type: :request do
+  let(:user) { create(:user) }
+
   describe 'POST /authenticate' do
     context 'valid request' do
+      before do
+        post '/authenticate', params: { email: user.email, password: 'Asdf123' }
+      end
+
       it 'returns a http status of :created' do
-        post '/authenticate', params: { username: 'Username123', password: 'Asdf123' }
         expect(response).to have_http_status :created
+      end
+
+      it 'returns jwt token' do
+        decoded_token = JWT.decode(response_body["token"], AuthenticationTokenService::HMAC_SECRET, true, { algorithm: AuthenticationTokenService::ALGORITHM_TYPE })
+        expect(decoded_token).to eq(
+          [{ 'user_id' => user.id }, { 'alg' => 'HS256' }]
+        )
       end
     end
 
@@ -16,16 +28,16 @@ RSpec.describe 'Authentication', type: :request do
         expect(response).to have_http_status :unprocessable_entity
       end
 
-      it 'returns error if username param is missing' do
+      it 'returns error if email param is missing' do
         post '/authenticate', params: { password: 'Asdf123' }
 
         expect(response_body).to eq(
-          { 'error' => 'param is missing or the value is empty: username' }
+          { 'error' => 'param is missing or the value is empty: email' }
         )
       end
 
       it 'returns error if password param is missing' do
-        post '/authenticate', params: { username: 'Username123' }
+        post '/authenticate', params: { email: user.email }
 
         expect(response_body).to eq(
           { 'error' => 'param is missing or the value is empty: password' }
