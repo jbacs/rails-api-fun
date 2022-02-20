@@ -6,5 +6,7 @@ Rails.application.routes.draw do
               defaults: { format: 'json' },
               default: true) do
     resources :books, only: %i[index create destroy]
+
+    post '/authenticate' => 'authentication#create'
   end
 end

@@ -37,6 +37,7 @@ gem "bootsnap", require: false
 # gem "rack-cors"
 
 gem 'jsonapi-serializer'
+gem 'jwt'
 gem 'versionist'
 
 group :development, :test do
