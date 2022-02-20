@@ -1,6 +1,5 @@
 FactoryBot.define do
   factory :book do
-    title { "MyString" }
-    author { nil }
+    title { Faker::Book.title }
   end
 end
