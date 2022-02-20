@@ -61,7 +61,6 @@ RSpec.describe 'Books', type: :request do
       expect(response_body).to eq(
         {
           'data' => { 'attributes' => { 'title' => book.title }, 'id' => book.id.to_s, 'type' => 'book' }
-          
         }
       )
     end

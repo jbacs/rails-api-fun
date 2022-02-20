@@ -1,7 +1,7 @@
-class BooksController < ApplicationController
+class Api::V1::BooksController < Api::V1::BaseController
   def index
     books = Book.all
-    render json: BookSerializer.new(books).serializable_hash.to_json, status: :ok
+    success_response BookSerializer.new(books).serializable_hash.to_json
   end
 
   def create
@@ -9,9 +9,9 @@ class BooksController < ApplicationController
     book = Book.new(book_params.merge(author_id: author.id))
 
     if book.save
-      render json: BookSerializer.new(book).serializable_hash.to_json, status: :created
+      success_response BookSerializer.new(book).serializable_hash.to_json, :created
     else
-      render json: { error: book.errors }, status: :unprocessable_entity
+      error_response({ error: book.errors }, :unprocessable_entity)
     end
   end
 
